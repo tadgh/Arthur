@@ -38,6 +38,11 @@ def extract_hot_words_from_message(text):
 
     return HotWord.objects.filter(text__in=grams_to_check)
 
+
+def respond_with_no_valid_messages():
+    return "Sorry, we couldn't find any recent messages worth checking!"
+
+
 def handle_explain(slash_payload):
     message = slash_payload.get("text")
     channel_id = slash_payload.get("channel_id")
@@ -46,7 +51,8 @@ def handle_explain(slash_payload):
     if len(message) == 0:
         logger.info("No message passed to /explain command, fetching most recent message.")
         message = fetch_most_recent_message_from_channel(caller, user_client, channel_id)
-
+    if not message:
+        return Response(respond_with_no_valid_messages(), status=status.HTTP_200_OK)
     print(f"pulling hotwords from [{message}]")
     hot_words = extract_hot_words_from_message(message)
     if hot_words.count() > 0:
