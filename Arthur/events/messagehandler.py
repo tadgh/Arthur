@@ -1,6 +1,7 @@
 import logging
 
 from nltk import ngrams
+from nltk.tokenize import word_tokenize
 from rest_framework import status
 from rest_framework.response import Response
 from slackclient import SlackClient
@@ -29,7 +30,7 @@ def parse_define_command(payload):
         return parts
 
 def extract_hot_words_from_message(text):
-    unigrams = text.lower().split()
+    unigrams = list(word_tokenize(text))
     bigrams = list(ngrams(unigrams, 2))
     joined_bigrams = [" ".join(bigram) for bigram in bigrams]
 
@@ -44,7 +45,8 @@ def handle_explain(slash_payload):
     if len(message) == 0:
         logger.info("No message passed to /explain command, fetching most recent message.")
         message = fetch_most_recent_message_from_channel(user_client, channel_id)
-
+asdasd
+    print(f"pulling hotwords from [{message}]")
     hot_words = extract_hot_words_from_message(message)
     if hot_words.count() > 0:
         return Response(respond_with_acronym_information(hot_words), status=status.HTTP_200_OK)
@@ -63,7 +65,7 @@ def classify_hotword(hotword):
     else:
         return HotWord.BUZZWORD
 
-def _respond_successfully_saved_response(self, hotword):
+def _respond_successfully_saved_response(hotword):
     return f"Successfully defined *{hotword.text}* as *{hotword.meaning}*"
 
 def handle_define(slash_payload):
