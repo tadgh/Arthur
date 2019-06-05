@@ -41,11 +41,12 @@ def extract_hot_words_from_message(text):
 def handle_explain(slash_payload):
     message = slash_payload.get("text")
     channel_id = slash_payload.get("channel_id")
+    caller = slash_payload.get("user_id")
     print(slash_payload)
     if len(message) == 0:
         logger.info("No message passed to /explain command, fetching most recent message.")
-        message = fetch_most_recent_message_from_channel(user_client, channel_id)
-asdasd
+        message = fetch_most_recent_message_from_channel(caller, user_client, channel_id)
+
     print(f"pulling hotwords from [{message}]")
     hot_words = extract_hot_words_from_message(message)
     if hot_words.count() > 0:

@@ -9,6 +9,7 @@ WORKDIR /code
 RUN pip install pipenv
 COPY Pipfile Pipfile.lock /code/
 RUN pipenv install --system
+RUN python -m nltk.downloader punkt
 COPY . /code/
 
 

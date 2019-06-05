@@ -27,11 +27,13 @@ def respond_with_acronym_information(hot_words):
         "response_type": "ephemeral"
     }
 
-def fetch_most_recent_message_from_channel(client, channel):
-    response = client.api_call("channels.history", channel=channel, count=1)
+def fetch_most_recent_message_from_channel(calling_user, client, channel):
+    response = client.api_call("channels.history", channel=channel, count=20)
     if response['ok']:
         try:
-            return response['messages'][0]['text']
+            for message in response['messages']:
+                if message["user"] != calling_user:
+                    return message['text']
         except (IndexError, AttributeError) as e:
             logger.warning(f"Unable to pull from channel with id {channel}. No messages in it?")
             return None
