@@ -55,7 +55,7 @@ def handle_explain(slash_payload):
         return Response(respond_with_no_hot_words_found(), status=status.HTTP_200_OK)
 
 def _respond_with_help():
-    return f"Sorry, I didn't understand that. Try a message like this: `/define TGIF : Thank god it's friday!`"
+    return f"Sorry, I didn't understand that. Try a message like this: `/define TGIF : Thank god it's friday!`. The messages must follow the format of `/define <word> : <definition>` with a colon separating them."
 
 def _respond_already_exists(hotword):
     return f"Sorry, looks like that word has already been defined as: *{hotword.meaning}*"
