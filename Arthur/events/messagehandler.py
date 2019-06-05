@@ -9,7 +9,7 @@ from slackclient import SlackClient
 from Arthur import settings
 from events.models import HotWord, SlackMessage, Utterance
 from events.slackhelper import is_bot_message, is_in_thread, is_edit_message, respond_with_acronym_information, \
-    fetch_most_recent_message_from_channel, respond_with_no_hot_words_found
+    fetch_most_recent_message_from_channel, respond_with_no_hot_words_found, respond_with_no_valid_messages
 
 SLACK_VERIFICATION_TOKEN = getattr(settings, 'SLACK_VERIFICATION_TOKEN', None)
 SLACK_BOT_USER_TOKEN = getattr(settings, 'SLACK_BOT_USER_TOKEN', None)
@@ -39,21 +39,20 @@ def extract_hot_words_from_message(text):
     return HotWord.objects.filter(text__in=grams_to_check)
 
 
-def respond_with_no_valid_messages():
-    return "Sorry, we couldn't find any recent messages worth checking!"
 
 
 def handle_explain(slash_payload):
     message = slash_payload.get("text")
     channel_id = slash_payload.get("channel_id")
     caller = slash_payload.get("user_id")
-    print(slash_payload)
+    logger.debug(slash_payload)
     if len(message) == 0:
         logger.info("No message passed to /explain command, fetching most recent message.")
         message = fetch_most_recent_message_from_channel(caller, user_client, channel_id)
     if not message:
         return Response(respond_with_no_valid_messages(), status=status.HTTP_200_OK)
-    print(f"pulling hotwords from [{message}]")
+
+    logger.info(f"pulling hotwords from [{message}]")
     hot_words = extract_hot_words_from_message(message)
     if hot_words.count() > 0:
         return Response(respond_with_acronym_information(hot_words), status=status.HTTP_200_OK)

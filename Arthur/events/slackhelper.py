@@ -27,6 +27,12 @@ def respond_with_acronym_information(hot_words):
         "response_type": "ephemeral"
     }
 
+def respond_with_no_valid_messages():
+    return {
+        "text": "Sorry, we couldn't find any recent messages worth checking!",
+        "response_type": "ephemeral"
+    }
+
 def fetch_most_recent_message_from_channel(calling_user, client, channel):
     response = client.api_call("channels.history", channel=channel, count=20)
     if response['ok']:
