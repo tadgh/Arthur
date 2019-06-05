@@ -32,7 +32,7 @@ def fetch_most_recent_message_from_channel(calling_user, client, channel):
     if response['ok']:
         try:
             for message in response['messages']:
-                if message["user"] != calling_user:
+                if "user_id" in message and message["user_id"] != calling_user:
                     return message['text']
         except (IndexError, AttributeError) as e:
             logger.warning(f"Unable to pull from channel with id {channel}. No messages in it?")
