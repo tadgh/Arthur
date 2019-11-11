@@ -77,6 +77,7 @@ def handle_define(slash_payload):
         outcome_response = _respond_with_help()
     else:
         try:
+            text = text.strip()
             found = HotWord.objects.get(text=text)
             outcome_response = _respond_already_exists(found)
         except HotWord.DoesNotExist:
