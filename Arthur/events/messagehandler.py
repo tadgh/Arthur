@@ -18,7 +18,7 @@ SLACK_USER_USER_TOKEN = getattr(settings, 'SLACK_USER_USER_TOKEN', None)
 logger = logging.getLogger(__name__)
 bot_client = SlackClient(SLACK_BOT_USER_TOKEN)
 user_client = SlackClient(SLACK_USER_USER_TOKEN)
-
+logger.info("booted!")
 
 def parse_define_command(payload):
     text = payload.get('text')
@@ -37,9 +37,6 @@ def extract_hot_words_from_message(text):
     grams_to_check = unigrams + joined_bigrams
 
     return HotWord.objects.filter(text__in=grams_to_check)
-
-
-
 
 def handle_explain(slash_payload):
     message = slash_payload.get("text")

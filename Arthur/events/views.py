@@ -33,9 +33,6 @@ class HotWords(ReadOnlyModelViewSet):
     queryset = HotWord.objects.all()
     serializer_class = HotWordSerializer
 
-
-
-
     @action(methods=['post'], detail=False)
     def explain(self, request, *args, **kwargs):
         slash_payload = request.data
