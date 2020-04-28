@@ -4,21 +4,18 @@ from nltk import ngrams
 from nltk.tokenize import word_tokenize
 from rest_framework import status
 from rest_framework.response import Response
-from slackclient import SlackClient
+from slack import WebClient
 
 from Arthur import settings
 from events.models import HotWord, SlackMessage, Utterance
 from events.slackhelper import is_bot_message, is_in_thread, is_edit_message, respond_with_acronym_information, \
     fetch_most_recent_message_from_channel, respond_with_no_hot_words_found, respond_with_no_valid_messages
 
-SLACK_VERIFICATION_TOKEN = getattr(settings, 'SLACK_VERIFICATION_TOKEN', None)
+SLACK_SIGNING_SECRET = getattr(settings, 'SLACK_SIGNING_SECRET', None)
 SLACK_BOT_USER_TOKEN = getattr(settings, 'SLACK_BOT_USER_TOKEN', None)
-SLACK_USER_USER_TOKEN = getattr(settings, 'SLACK_USER_USER_TOKEN', None)
 
 logger = logging.getLogger(__name__)
-bot_client = SlackClient(SLACK_BOT_USER_TOKEN)
-user_client = SlackClient(SLACK_USER_USER_TOKEN)
-logger.info("booted!")
+bot_client = WebClient(SLACK_BOT_USER_TOKEN)
 
 def parse_define_command(payload):
     text = payload.get('text')
@@ -45,7 +42,8 @@ def handle_explain(slash_payload):
     logger.debug(slash_payload)
     if len(message) == 0:
         logger.info("No message passed to /explain command, fetching most recent message.")
-        message = fetch_most_recent_message_from_channel(caller, user_client, channel_id)
+
+        message = fetch_most_recent_message_from_channel(caller, bot_client, channel_id)
     if not message:
         return Response(respond_with_no_valid_messages(), status=status.HTTP_200_OK)
 

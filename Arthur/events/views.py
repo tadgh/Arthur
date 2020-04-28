@@ -19,7 +19,7 @@ from events.models import Team, HotWord, Utterance, SlackMessage
 from events.serializers import TeamSerializer, HotWordSerializer, UtteranceSerializer, LeaderboardSerializer
 
 
-SLACK_VERIFICATION_TOKEN = getattr(settings, 'SLACK_VERIFICATION_TOKEN', None)
+SLACK_SIGNING_SECRET = getattr(settings, 'SLACK_SIGNING_SECRET', None)
 
 logger = logging.getLogger(__name__)
 
@@ -68,7 +68,7 @@ class Leaderboard(ModelViewSet):
 class Events(APIView):
     def post(self, request, *args, **kwargs):
         slack_message = request.data
-        if slack_message.get("token") != SLACK_VERIFICATION_TOKEN:
+        if slack_message.get("token") != SLACK_SIGNING_SECRET:
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         if slack_message.get("type") == "url_verification":

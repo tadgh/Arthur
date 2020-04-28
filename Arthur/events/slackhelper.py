@@ -1,5 +1,8 @@
 import logging
 
+from slack import WebClient
+from slack.errors import SlackApiError
+
 logger = logging.getLogger(__name__)
 
 def is_bot_message(slack_event):
@@ -33,9 +36,16 @@ def respond_with_no_valid_messages():
         "response_type": "ephemeral"
     }
 
-def fetch_most_recent_message_from_channel(calling_user, client, channel):
-    response = client.api_call("channels.history", channel=channel, count=20)
-    if response['ok']:
+def fetch_most_recent_message_from_channel(calling_user, client:WebClient, channel):
+    response = None
+    try:
+        response = client.conversations_history(channel=channel, count=20)
+    except SlackApiError as e:
+        if e.response["error"] == "not_in_channel":
+            join_channel(channel, client)
+            response = client.channels_history(channel=channel, count=20)
+
+    if response and response['ok']:
         try:
             for message in response['messages']:
                 logger.debug(f"Checking message: {message['text']}")
@@ -48,3 +58,7 @@ def fetch_most_recent_message_from_channel(calling_user, client, channel):
     else:
         logger.error(f"Client was unable to read channel history: {response['error']}")
         return None
+
+def join_channel(channel, client:WebClient):
+    client.conversations_join(channel=channel)
+
